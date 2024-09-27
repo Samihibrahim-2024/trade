@@ -1,0 +1,15 @@
+{
+  "name": "trade",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Samihibrahim-2024/trade.git",
+  "author": "Samihibrahim-2024 <samihsheekhibrahim@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0",
+    "node-fetch": "^3.3.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
