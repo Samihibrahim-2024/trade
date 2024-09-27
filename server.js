@@ -1,10 +1,15 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const cors = require('cors'); // استيراد مكتبة CORS
 const app = express();
 const port = 3000;
 
 // ضع هنا مفتاح الـ API الخاص بك
 const API_KEY = '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm';  // استبدلها بمفتاح الـ API الخاص بك
+
+app.use(cors({
+    origin: 'https://pusdt.io' // اسم المجال الذي تريد السماح له
+}));
 
 app.use(express.json());
 
@@ -25,9 +30,9 @@ app.post('/api/new_rate', async (req, res) => {
         });
         
         const data = await response.json();
-
-        // بدلاً من توجيه المستخدم، نعيد الاستجابة كما هي
-        res.json(data); // إعادة البيانات كما هي
+        
+        // إعادة البيانات كما هي بدلاً من إعادة التوجيه
+        res.json(data);
 
     } catch (error) {
         console.error('Error fetching API:', error);
