@@ -7,6 +7,7 @@ const port = 3000;
 // ضع هنا مفتاح الـ API الخاص بك
 const API_KEY = '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm';  // استبدلها بمفتاح الـ API الخاص بك
 
+// إعداد CORS للسماح بالوصول من موقع محدد
 app.use(cors({
     origin: 'https://pusdt.io' // اسم المجال الذي تريد السماح له
 }));
@@ -28,7 +29,12 @@ app.post('/api/new_rate', async (req, res) => {
                 'Content-Type': 'application/json'
             }
         });
-        
+
+        // تحقق مما إذا كانت الاستجابة سليمة
+        if (!response.ok) {
+            throw new Error(`API response was not ok: ${response.statusText}`);
+        }
+
         const data = await response.json();
         
         // إعادة البيانات كما هي بدلاً من إعادة التوجيه
@@ -40,6 +46,7 @@ app.post('/api/new_rate', async (req, res) => {
     }
 });
 
+// بدء تشغيل الخادم
 app.listen(port, () => {
     console.log(`Proxy server is running on http://localhost:${port}`);
 });
