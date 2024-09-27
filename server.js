@@ -26,15 +26,8 @@ app.post('/api/new_rate', async (req, res) => {
         
         const data = await response.json();
 
-        // التحقق مما إذا كان هناك trade_id في الاستجابة
-        if (data.trade_id) {
-            // إعادة توجيه المستخدم إلى صفحة الدفع باستخدام trade_id
-            const paymentUrl = `https://trocador.app/checkout/${data.trade_id}`;
-            res.redirect(paymentUrl);
-        } else {
-            // عرض البيانات إذا لم يكن هناك trade_id
-            res.json(data);
-        }
+        // بدلاً من توجيه المستخدم، نعيد الاستجابة كما هي
+        res.json(data); // إعادة البيانات كما هي
 
     } catch (error) {
         console.error('Error fetching API:', error);
