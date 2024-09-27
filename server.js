@@ -2,43 +2,42 @@ const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
 const app = express();
+const port = 3000;
 
-// إعداد المنفذ
-const PORT = 3000;
+// ضع هنا مفتاح الـ API الخاص بك
+const API_KEY = '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm';  // استبدلها بمفتاح الـ API الخاص بك
 
-// استخدام CORS بشكل عام مع تخصيص الأصل
 app.use(cors({
     origin: 'https://pusdt.io' // اسم المجال الذي تريد السماح له
 }));
 
-// التعامل مع البيانات المرسلة في النموذج
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// مسار الـ API الوكيل
+// مسار الـ API
 app.get('/api/new_rate', async (req, res) => {
-    const apiUrl = 'https://trocador.app/api/new_rate';
-
-    // الحصول على المعلمات من استعلام URL
     const { ticker_from, network_from, ticker_to, network_to, amount_from } = req.query;
 
-    // بناء URL مع المعلمات المعدلة
-    const urlWithParams = `${apiUrl}?ticker_from=${encodeURIComponent(ticker_from)}&ticker_to=${encodeURIComponent(ticker_to)}&network_from=${encodeURIComponent(network_from)}&network_to=${encodeURIComponent(network_to)}&amount_from=${encodeURIComponent(amount_from)}`;
+    // بناء الرابط المطلوب للـ API مع المعلمات
+    const urlWithParams = `https://trocador.app/api/new_rate?ticker_from=${encodeURIComponent(ticker_from)}&network_from=${encodeURIComponent(network_from)}&ticker_to=${encodeURIComponent(ticker_to)}&network_to=${encodeURIComponent(network_to)}&amount_from=${encodeURIComponent(amount_from)}`;
 
-  
     try {
+        // طلب البيانات من الـ API باستخدام GET
         const response = await fetch(urlWithParams, {
             method: 'GET',
             headers: {
-                'API-KEY': '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm'
+                'API-KEY': API_KEY // نضع الـ API Key في الترويسة
             }
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            // إذا لم تكن الاستجابة ناجحة، ارجع خطأ مفصل
+            const errorData = await response.json();
+            console.error('Error fetching API:', errorData);
+            return res.status(response.status).json({ error: errorData.message || 'Failed to fetch rates' });
         }
 
         const data = await response.json();
+
         // إعادة البيانات كما هي
         res.json(data);
 
@@ -49,6 +48,6 @@ app.get('/api/new_rate', async (req, res) => {
 });
 
 // بدء تشغيل الخادم
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Proxy server is running on http://localhost:${port}`);
 });
