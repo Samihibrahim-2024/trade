@@ -1,43 +1,45 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors'); // استيراد مكتبة CORS
+const cors = require('cors');
 const app = express();
-const port = 3000;
 
-// ضع هنا مفتاح الـ API الخاص بك
-const API_KEY = '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm';  // استبدلها بمفتاح الـ API الخاص بك
+// إعداد المنفذ
+const PORT = 3000;
 
-// إعداد CORS للسماح بالوصول من موقع محدد
+// استخدام CORS بشكل عام مع تخصيص الأصل
 app.use(cors({
     origin: 'https://pusdt.io' // اسم المجال الذي تريد السماح له
 }));
 
+// التعامل مع البيانات المرسلة في النموذج
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.post('/api/new_rate', async (req, res) => {
-    const { ticker_from, network_from, ticker_to, network_to, amount_from } = req.body;
+// مسار الـ API الوكيل
+app.get('/api/new_rate', async (req, res) => {
+    const apiUrl = 'https://trocador.app/api/new_rate';
 
-    // بناء الرابط المطلوب للـ API
-    const apiUrl = `https://trocador.app/api/new_rate?ticker_from=${ticker_from}&network_from=${network_from}&ticker_to=${ticker_to}&network_to=${network_to}&amount_from=${amount_from}`;
+    // الحصول على المعلمات من استعلام URL
+    const { ticker_from, network_from, ticker_to, network_to, amount_from } = req.query;
 
+    // بناء URL مع المعلمات المعدلة
+    const urlWithParams = `${apiUrl}?ticker_from=${encodeURIComponent(ticker_from)}&ticker_to=${encodeURIComponent(ticker_to)}&network_from=${encodeURIComponent(network_from)}&network_to=${encodeURIComponent(network_to)}&amount_from=${encodeURIComponent(amount_from)}`;
+
+  
     try {
-        // طلب البيانات من الـ API باستخدام GET
-        const response = await fetch(apiUrl, {
+        const response = await fetch(urlWithParams, {
             method: 'GET',
             headers: {
-                'x-api-key': API_KEY, // نضع الـ API Key في الترويسة
-                'Content-Type': 'application/json'
+                'API-KEY': '7tBZyGqwxjxHLkX6CAqvnDgUJPLttm'
             }
         });
 
-        // تحقق مما إذا كانت الاستجابة سليمة
         if (!response.ok) {
-            throw new Error(`API response was not ok: ${response.statusText}`);
+            throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        
-        // إعادة البيانات كما هي بدلاً من إعادة التوجيه
+        // إعادة البيانات كما هي
         res.json(data);
 
     } catch (error) {
@@ -47,6 +49,6 @@ app.post('/api/new_rate', async (req, res) => {
 });
 
 // بدء تشغيل الخادم
-app.listen(port, () => {
-    console.log(`Proxy server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
