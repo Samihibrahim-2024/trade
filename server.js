@@ -34,9 +34,16 @@ app.get('/api/new_bridge', async (req, res) => {
         }
 
         const data = await response.json();
-        
-        // إعادة البيانات كما هي
-        res.json(data);
+
+        // تحقق مما إذا كان هناك trade_id في الاستجابة
+        if (data.trade_id) {
+            // إعادة توجيه المستخدم إلى صفحة الدفع باستخدام trade_id
+            const paymentUrl = `https://trocador.app/checkout/${data.trade_id}`;
+            res.redirect(paymentUrl);
+        } else {
+            // إذا لم يكن هناك trade_id، أعد البيانات كما هي
+            res.json(data);
+        }
 
     } catch (error) {
         console.error('Error fetching API:', error);
