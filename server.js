@@ -1,6 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors');
+const cors = require('cors'); // استيراد مكتبة CORS
 const app = express();
 const port = 3000;
 
@@ -12,32 +12,29 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// مسار الـ API
-app.get('/api/new_rate', async (req, res) => {
-    const { ticker_from, network_from, ticker_to, network_to, amount_from } = req.query;
+// مسار الـ API الجديد للتعامل مع التحويلات
+app.get('/api/new_bridge', async (req, res) => {
+    const { ticker_from, ticker_to, network_from, network_to, amount_from, address } = req.query;
 
-    // بناء الرابط المطلوب للـ API مع المعلمات
-    const urlWithParams = `https://trocador.app/api/new_rate?ticker_from=${encodeURIComponent(ticker_from)}&network_from=${encodeURIComponent(network_from)}&ticker_to=${encodeURIComponent(ticker_to)}&network_to=${encodeURIComponent(network_to)}&amount_from=${encodeURIComponent(amount_from)}`;
+    // بناء الرابط المطلوب للـ API
+    const apiUrl = `https://trocador.app/api/new_bridge?ticker_from=${ticker_from}&ticker_to=${ticker_to}&network_from=${network_from}&network_to=${network_to}&amount_from=${amount_from}&address=${address}`;
 
     try {
-        // طلب البيانات من الـ API باستخدام GET
-        const response = await fetch(urlWithParams, {
+        const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                'API-KEY': API_KEY // نضع الـ API Key في الترويسة
+                'API-KEY': API_KEY
             }
         });
 
         if (!response.ok) {
-            // إذا لم تكن الاستجابة ناجحة، ارجع خطأ مفصل
-            const errorData = await response.json();
-            console.error('Error fetching API:', errorData);
-            return res.status(response.status).json({ error: errorData.message || 'Failed to fetch rates' });
+            throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-
+        
         // إعادة البيانات كما هي
         res.json(data);
 
